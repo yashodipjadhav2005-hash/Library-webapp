@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramkrushna/seat</title>
+    <link rel="stylesheet" href="CSS/style.css">
+</head>
+
+<body>
+    <!-- Loader Animation -->
+    <div id="loader" aria-hidden="true">
+        <div class="loader-content">
+            <span class="loader-logo">RA</span>
+            <span class="loader-text">Preparing Your Study Space</span>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="site-header" id="top">
+        <nav class="nav-shell">
+            <!-- Logo / Brand -->
+            <a href="#top" class="brand">
+                Ramkrushna Abhyasika
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+                Menu
+            </button>
+
+            <!-- Navigation Links -->
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="seat.html" class="nav-link active">Select Seat</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-outline">Login</a>
+                <a href="seat.html" class="btn btn-primary">Book Seat</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="seat-page section">
+        <section class="seat-hero">
+            <h1>All Available Seats</h1>
+            <p>Each section has 15 total seats. Green seats are available and red seats are booked.</p>
+            <div class="legend" aria-label="Seat status legend">
+                <span class="legend-item"><span class="legend-dot available" aria-hidden="true"></span>Available</span>
+                <span class="legend-item"><span class="legend-dot booked" aria-hidden="true"></span>Booked</span>
+            </div>
+        </section>
+
+        <section class="sections-grid" id="sectionsGrid" aria-label="Library seat sections"></section>
+
+        <section class="admission-card" id="admissionCard">
+            <h2>Student Admission Form</h2>
+            <p>Select an available green seat to fill student details.</p>
+            <div class="selected-seat" id="selectedSeatLabel">No seat selected yet</div>
+            <div class="selected-pricing" id="selectedPricingLabel">Pricing will appear after seat selection.</div>
+
+            <form id="studentForm" class="student-form" novalidate>
+                <input type="hidden" id="selectedSection" name="selectedSection" required>
+                <input type="hidden" id="selectedSeat" name="selectedSeat" required>
+
+                <div class="field span-2">
+                    <label for="fullName">Student Full Name *</label>
+                    <input id="fullName" name="fullName" type="text" minlength="3" maxlength="80" required>
+                </div>
+
+                <div class="field span-2">
+                    <label for="address">Address *</label>
+                    <textarea id="address" name="address" minlength="10" maxlength="250" required></textarea>
+                </div>
+
+                <div class="field">
+                    <label for="dob">Date of Birth *</label>
+                    <input id="dob" name="dob" type="date" required>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email ID *</label>
+                    <input id="email" name="email" type="email" required>
+                </div>
+
+                <div class="field">
+                    <label for="aadhar">ID Proof (Aadhar Number) *</label>
+                    <input id="aadhar" name="aadhar" type="text" pattern="[0-9]{12}" maxlength="12" minlength="12"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label for="mobile">Mobile Number *</label>
+                    <input id="mobile" name="mobile" type="tel" pattern="[0-9]{10}" maxlength="10" minlength="10"
+                        required>
+                </div>
+
+                <div class="field">
+                    <label for="education">Education *</label>
+                    <input id="education" name="education" type="text" minlength="2" maxlength="60" required>
+                </div>
+
+                <div class="field">
+                    <label for="preparingFor">Preparing For *</label>
+                    <input id="preparingFor" name="preparingFor" type="text" minlength="2" maxlength="60" required>
+                </div>
+
+                <button type="submit">Submit Information</button>
+            </form>
+
+            <div class="success-box" id="successMessage" hidden></div>
+        </section>
+    </main>
+
+    <script>
+        window.__FIREBASE_CONFIG__ = {
+            apiKey: "AIzaSyBXroA4lePBUbVYBL4CF7KQcepRJUjD8FQ",
+            authDomain: "future-lab-2fede.firebaseapp.com",
+            projectId: "future-lab-2fede",
+            storageBucket: "future-lab-2fede.firebasestorage.app",
+            messagingSenderId: "21526003650",
+            appId: "1:21526003650:web:52e45d1d5d2d2fa9cb205b",
+            measurementId: "G-TW0NGZ357G"
+        };
+    </script>
+    <script type="module" src="JS/app.js"></script>
+</body>
+
+</html>
