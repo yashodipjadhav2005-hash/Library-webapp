@@ -862,6 +862,10 @@ body {
     background: #dc2626;
 }
 
+.legend-dot.reserved {
+    background: #FF9800;
+}
+
 .sections-grid {
     margin-top: 20px;
     display: grid;
