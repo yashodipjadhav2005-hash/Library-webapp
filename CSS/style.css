@@ -180,6 +180,59 @@ body {
     }
 }
 
+/* Mobile Action Buttons */
+.mobile-actions {
+    display: none;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Login Icon */
+.mobile-login-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    color: rgb(0, 0, 0);
+
+    text-decoration: none;
+
+    backdrop-filter: blur(10px);
+
+    transition: 0.3s ease;
+}
+
+.mobile-login-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* Mobile Only */
+@media (max-width: 768px) {
+
+    .brand {
+        font-size: 15px;
+    }
+
+    .mobile-actions {
+        display: flex;
+    }
+
+    .nav-actions {
+        display: none;
+    }
+
+}
+
 /* === HERO SECTION === */
 
 .hero {
