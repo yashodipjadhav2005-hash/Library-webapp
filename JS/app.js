@@ -88,10 +88,15 @@ async function saveSeatAdmission(payload) {
     const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    await addDoc(collection(db, "seatAdmissions"), {
-        ...payload,
-        createdAt: serverTimestamp()
-    });
+    const docRef = await addDoc(
+        collection(db, "seatAdmissions"),
+        {
+            ...payload,
+            createdAt: serverTimestamp()
+        }
+    );
+
+    return docRef.id;
 }
 
 // const totalSeats = 15;
@@ -690,7 +695,7 @@ if (
 
     setupFieldValidation(studentForm);
 
-    studentForm.addEventListener("submit", (event) => {
+    studentForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         if (!validateSeatSelection()) {
@@ -707,8 +712,24 @@ if (
         }
 
         const formData = new FormData(studentForm);
+        const photoInput =
+            document.getElementById("studentPhoto");
+
+        const photoFile =
+            photoInput && photoInput.files.length > 0
+                ? photoInput.files[0]
+                : null;
         const submitButton = studentForm.querySelector('button[type="submit"]');
         const originalButtonText = submitButton ? submitButton.textContent : "";
+
+        let photoUrl = "";
+
+        if (photoFile) {
+
+            photoUrl =
+                await uploadStudentPhoto(photoFile);
+
+        }
 
         const payload = {
             section: selectedSectionInput.value,
@@ -720,7 +741,8 @@ if (
             aadhar: formData.get("aadhar")?.toString().trim() || "",
             mobile: formData.get("mobile")?.toString().trim() || "",
             education: formData.get("education")?.toString().trim() || "",
-            preparingFor: formData.get("preparingFor")?.toString().trim() || ""
+            preparingFor: formData.get("preparingFor")?.toString().trim() || "",
+            photoUrl: photoUrl
         };
 
         successMessage.hidden = true;
@@ -730,43 +752,71 @@ if (
             submitButton.textContent = "Submitting...";
         }
 
-        saveSeatAdmission(payload)
-            .then(async () => {
-                await reserveSeat(
-                    payload.section,
-                    Number(payload.seatNumber)
+        try {
+
+            const reservationId =
+                await saveSeatAdmission(payload);
+
+            await reserveSeat(
+                payload.section,
+                Number(payload.seatNumber),
+                reservationId
+            );
+
+            openPopup();
+
+            studentForm.reset();
+
+            resetFormValidation(studentForm);
+
+            selectedSectionInput.value = "";
+            selectedSeatInput.value = "";
+
+            selectedSeatLabel.textContent =
+                "No seat selected yet";
+
+            selectedSeatLabel.classList.remove(
+                "selection-error"
+            );
+
+            selectedPricingLabel.textContent =
+                "Pricing will appear after seat selection.";
+
+            if (activeSeatButton) {
+
+                activeSeatButton.classList.remove(
+                    "selected"
                 );
 
-                // Show popup
-                openPopup();
-                studentForm.reset();
-                resetFormValidation(studentForm);
-                selectedSectionInput.value = "";
-                selectedSeatInput.value = "";
-                selectedSeatLabel.textContent = "No seat selected yet";
-                selectedSeatLabel.classList.remove("selection-error");
-                selectedPricingLabel.textContent = "Pricing will appear after seat selection.";
+                activeSeatButton = null;
+            }
 
-                if (activeSeatButton) {
-                    activeSeatButton.classList.remove("selected");
-                    activeSeatButton = null;
-                }
+        }
+        catch (error) {
 
-            })
-            .catch((error) => {
-                console.error("Firebase Error:", error);   // 👈 see details in console
-                successMessage.hidden = false;
-                successMessage.textContent = error.message; // 👈 show exact reason
-            })
-            .finally(() => {
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                }
-            });
+            console.error(
+                "Firebase Error:",
+                error
+            );
+
+            successMessage.hidden = false;
+
+            successMessage.textContent =
+                error.message;
+        }
+        finally {
+
+            if (submitButton) {
+
+                submitButton.disabled = false;
+
+                submitButton.textContent =
+                    originalButtonText;
+            }
+        }
     });
 
-    async function reserveSeat(sectionName, seatNumber) {
+    async function reserveSeat(sectionName, seatNumber, reservationId) {
 
         const firebaseConfig = window.__FIREBASE_CONFIG__;
 
@@ -813,11 +863,48 @@ if (
             console.log("Updating:", docItem.id);
 
             await updateDoc(docItem.ref, {
-                status: "Reserved"
+                status: "Reserved",
+                reservationId: reservationId
             });
 
         });
     }
 
+}
+
+async function uploadStudentPhoto(file) {
+
+    const firebaseConfig = window.__FIREBASE_CONFIG__;
+
+    const [
+        { initializeApp, getApps, getApp },
+        {
+            getStorage,
+            ref,
+            uploadBytes,
+            getDownloadURL
+        }
+    ] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js")
+    ]);
+
+    const app = getApps().length
+        ? getApp()
+        : initializeApp(firebaseConfig);
+
+    const storage = getStorage(app);
+
+    const fileName =
+        `students/${Date.now()}_${file.name}`;
+
+    const storageRef = ref(storage, fileName);
+
+    await uploadBytes(storageRef, file);
+
+    const downloadURL =
+        await getDownloadURL(storageRef);
+
+    return downloadURL;
 }
 
