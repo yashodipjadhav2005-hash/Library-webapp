@@ -1146,3 +1146,91 @@ body {
         font-size: 0.68rem;
     }
 }
+
+/* Seat.html */
+/* Popup Background */
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    transition: 0.3s ease;
+
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.popup-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Popup Box */
+.popup-box {
+    width: 90%;
+    max-width: 380px;
+
+    background: white;
+    border-radius: 20px;
+
+    padding: 30px 24px;
+    text-align: center;
+
+    animation: popupScale 0.3s ease;
+}
+
+/* Icon */
+.popup-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+/* Title */
+.popup-box h2 {
+    margin-bottom: 10px;
+    color: #222;
+}
+
+/* Text */
+.popup-box p {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Button */
+.popup-box button {
+    border: none;
+    background: #4CAF50;
+    color: white;
+
+    padding: 12px 24px;
+    border-radius: 10px;
+
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Animation */
+@keyframes popupScale {
+
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.popup-overlay {
+    display: flex;
+}

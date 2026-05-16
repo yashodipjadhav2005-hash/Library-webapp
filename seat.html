@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramkrushna/seat</title>
+    <title>Seat | Ramkrushna</title>
     <link rel="stylesheet" href="CSS/style.css">
 </head>
 
@@ -21,20 +21,19 @@
     <header class="site-header" id="top">
         <nav class="nav-shell">
             <!-- Logo / Brand -->
-            <a href="#top" class="brand">
+            <a href="index.html" class="brand">
                 Ramkrushna Abhyasika
             </a>
 
             <!-- Mobile Menu Button -->
             <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
-                Menu
+                ☰
             </button>
 
             <!-- Navigation Links -->
             <div class="nav-links" id="navLinks">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="seat.html" class="nav-link active">Select Seat</a>
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
             </div>
 
             <!-- CTA Buttons -->
@@ -115,6 +114,29 @@
             <div class="success-box" id="successMessage" hidden></div>
         </section>
     </main>
+
+    <div id="successPopup" class="popup-overlay" hidden>
+
+        <div class="popup-box">
+
+            <div class="popup-icon">✅</div>
+
+            <h2>Admission Submitted</h2>
+
+            <p>
+                📍 You can temporarily sit at your selected table.
+                <br>
+                💳 Please make the payment when the coordinator/owner is available in the library.
+            </p>
+
+            <button id="closePopup">
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
 
     <script>
         window.__FIREBASE_CONFIG__ = {
