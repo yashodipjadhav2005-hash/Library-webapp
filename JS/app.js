@@ -94,18 +94,6 @@ async function saveSeatAdmission(payload) {
     });
 }
 
-// Seat page
-// const sectionConfigs = [
-//     { name: "Section 1", type: "AC", seatFee: 1000, registrationFee: 100, booked: [2, 5, 8, 11] },
-//     { name: "Section 2", type: "AC", seatFee: 1000, registrationFee: 100, booked: [1, 4, 6, 10, 14] },
-//     { name: "Section 3", type: "Semi-AC", seatFee: 1000, registrationFee: 100, booked: [3, 7, 9] },
-//     { name: "Section 4", type: "Non-AC", seatFee: 800, registrationFee: 100, booked: [2, 5, 6, 12, 15] },
-//     { name: "Section 5", type: "Non-AC", seatFee: 700, registrationFee: 100, booked: [1, 8, 11, 13] },
-//     { name: "Section 6", type: "AC", seatFee: 700, registrationFee: 100, booked: [4, 7, 10, 12] },
-//     { name: "Section 7", type: "Non-AC", seatFee: 850, registrationFee: 100, booked: [3, 5, 9, 14] },
-//     { name: "Section 8", type: "Non-AC", seatFee: 700, registrationFee: 100, booked: [2, 6, 8, 15] }
-// ];
-
 // const totalSeats = 15;
 const sectionsGrid = document.getElementById("sectionsGrid");
 const studentForm = document.getElementById("studentForm");
