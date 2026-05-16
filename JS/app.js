@@ -298,8 +298,12 @@ function renderSections(sectionMap) {
             seat => seat.status === "Booked"
         ).length;
 
+        const reservedCount = seats.filter(
+            seat => seat.status === "Reserved"
+        ).length;
+
         const availableCount =
-            seats.length - bookedCount;
+            seats.length - bookedCount - reservedCount;
 
         const section = {
             name: sectionName,
@@ -328,6 +332,10 @@ function renderSections(sectionMap) {
 
                 <span class="count-chip">
                     Available: ${availableCount}
+                </span>
+
+                <span class="count-chip">
+                    Reserved: ${reservedCount}
                 </span>
 
                 <span class="count-chip">
@@ -369,8 +377,15 @@ function createDynamicSeat(section, seatData) {
     const isBooked =
         seatData.status === "Booked";
 
-    seat.className =
-        `seat ${isBooked ? "booked" : "available"}`;
+    const isReserved =
+        seatData.status === "Reserved";
+
+    seat.className = `seat ${isBooked
+        ? "booked"
+        : isReserved
+            ? "reserved"
+            : "available"
+        }`;
 
     seat.type = "button";
 
@@ -380,9 +395,9 @@ function createDynamicSeat(section, seatData) {
         </span>
     `;
 
-    seat.disabled = isBooked;
+    seat.disabled = isBooked || isReserved;
 
-    if (!isBooked) {
+    if (!isBooked && !isReserved) {
 
         seat.addEventListener("click", () => {
 
@@ -728,7 +743,12 @@ if (
         }
 
         saveSeatAdmission(payload)
-            .then(() => {
+            .then(async () => {
+                await reserveSeat(
+                    payload.section,
+                    Number(payload.seatNumber)
+                );
+
                 // Show popup
                 openPopup();
                 studentForm.reset();
@@ -757,31 +777,59 @@ if (
                 }
             });
     });
+
+    async function reserveSeat(sectionName, seatNumber) {
+
+        const firebaseConfig = window.__FIREBASE_CONFIG__;
+
+        const [
+            { initializeApp, getApps, getApp },
+            {
+                getFirestore,
+                collection,
+                query,
+                where,
+                getDocs,
+                updateDoc
+            }
+        ] = await Promise.all([
+            import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"),
+            import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js")
+        ]);
+
+        const app = getApps().length
+            ? getApp()
+            : initializeApp(firebaseConfig);
+
+        const db = getFirestore(app);
+
+        const seatsRef = collection(
+            db,
+            "admins",
+            "vez5ClBMuNPiNWkAJnA5b1hJqCD3",
+            "seat"
+        );
+
+        const q = query(
+            seatsRef,
+            where("section", "==", sectionName),
+            where("seatNumber", "==", Number(seatNumber))
+        );
+
+        const snapshot = await getDocs(q);
+
+        console.log("Found Seats:", snapshot.size);
+
+        snapshot.forEach(async (docItem) => {
+
+            console.log("Updating:", docItem.id);
+
+            await updateDoc(docItem.ref, {
+                status: "Reserved"
+            });
+
+        });
+    }
+
 }
 
-
-// if (successPopup) {
-
-//     successPopup.addEventListener("click", (e) => {
-
-//         if (e.target === successPopup) {
-
-//             successPopup.classList.remove("show");
-
-//         }
-
-//     });
-
-// }
-
-// if (successPopup) {
-
-//     successPopup.classList.add("show");
-
-//     setTimeout(() => {
-
-//         successPopup.classList.remove("show");
-
-//     }, 4000);
-
-// }

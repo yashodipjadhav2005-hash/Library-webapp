@@ -1234,3 +1234,9 @@ body {
 .popup-overlay {
     display: flex;
 }
+
+.seat.reserved {
+    background: #FF9800;
+    color: white;
+    cursor: not-allowed;
+}
