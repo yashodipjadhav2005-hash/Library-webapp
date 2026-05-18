@@ -224,6 +224,7 @@ const validatorConfigs = {
     }
 };
 let activeSeatButton = null;
+let selectedSeatType = "";
 
 async function loadSeatsFromFirebase() {
 
@@ -283,7 +284,18 @@ function renderSections(sectionMap) {
 
     Object.keys(sectionMap).forEach((sectionName) => {
 
-        const seats = sectionMap[sectionName];
+        const seats = sectionMap[sectionName].sort((a, b) => {
+
+            const seatA = parseInt(
+                String(a.seatNumber).replace("S", "")
+            );
+
+            const seatB = parseInt(
+                String(b.seatNumber).replace("S", "")
+            );
+
+            return seatA - seatB;
+        });
 
         const firstSeat = seats[0];
 
@@ -407,6 +419,8 @@ function createDynamicSeat(section, seatData) {
 
             selectedSeatInput.value =
                 seatData.seatNumber;
+
+            selectedSeatType = section.type;
 
             selectedSeatLabel.textContent =
                 `Selected: ${section.name}
@@ -695,7 +709,7 @@ if (
 
     setupFieldValidation(studentForm);
 
-    studentForm.addEventListener("submit", async (event) => {
+    studentForm.addEventListener("submit", (event) => {
         event.preventDefault();
 
         if (!validateSeatSelection()) {
@@ -712,28 +726,13 @@ if (
         }
 
         const formData = new FormData(studentForm);
-        const photoInput =
-            document.getElementById("studentPhoto");
-
-        const photoFile =
-            photoInput && photoInput.files.length > 0
-                ? photoInput.files[0]
-                : null;
         const submitButton = studentForm.querySelector('button[type="submit"]');
         const originalButtonText = submitButton ? submitButton.textContent : "";
-
-        let photoUrl = "";
-
-        if (photoFile) {
-
-            photoUrl =
-                await uploadStudentPhoto(photoFile);
-
-        }
 
         const payload = {
             section: selectedSectionInput.value,
             seatNumber: selectedSeatInput.value,
+            seatType: selectedSeatType,
             fullName: formData.get("fullName")?.toString().trim() || "",
             address: formData.get("address")?.toString().trim() || "",
             dob: formData.get("dob")?.toString() || "",
@@ -741,8 +740,7 @@ if (
             aadhar: formData.get("aadhar")?.toString().trim() || "",
             mobile: formData.get("mobile")?.toString().trim() || "",
             education: formData.get("education")?.toString().trim() || "",
-            preparingFor: formData.get("preparingFor")?.toString().trim() || "",
-            photoUrl: photoUrl
+            preparingFor: formData.get("preparingFor")?.toString().trim() || ""
         };
 
         successMessage.hidden = true;
@@ -752,68 +750,41 @@ if (
             submitButton.textContent = "Submitting...";
         }
 
-        try {
-
-            const reservationId =
-                await saveSeatAdmission(payload);
-
-            await reserveSeat(
-                payload.section,
-                Number(payload.seatNumber),
-                reservationId
-            );
-
-            openPopup();
-
-            studentForm.reset();
-
-            resetFormValidation(studentForm);
-
-            selectedSectionInput.value = "";
-            selectedSeatInput.value = "";
-
-            selectedSeatLabel.textContent =
-                "No seat selected yet";
-
-            selectedSeatLabel.classList.remove(
-                "selection-error"
-            );
-
-            selectedPricingLabel.textContent =
-                "Pricing will appear after seat selection.";
-
-            if (activeSeatButton) {
-
-                activeSeatButton.classList.remove(
-                    "selected"
+        saveSeatAdmission(payload)
+            .then(async (reservationId) => {
+                await reserveSeat(
+                    payload.section,
+                    Number(payload.seatNumber),
+                    reservationId
                 );
 
-                activeSeatButton = null;
-            }
+                // Show popup
+                openPopup();
+                studentForm.reset();
+                resetFormValidation(studentForm);
+                selectedSectionInput.value = "";
+                selectedSeatInput.value = "";
+                selectedSeatLabel.textContent = "No seat selected yet";
+                selectedSeatLabel.classList.remove("selection-error");
+                selectedPricingLabel.textContent = "Pricing will appear after seat selection.";
 
-        }
-        catch (error) {
+                if (activeSeatButton) {
+                    activeSeatButton.classList.remove("selected");
+                    activeSeatButton = null;
+                }
 
-            console.error(
-                "Firebase Error:",
-                error
-            );
-
-            successMessage.hidden = false;
-
-            successMessage.textContent =
-                error.message;
-        }
-        finally {
-
-            if (submitButton) {
-
-                submitButton.disabled = false;
-
-                submitButton.textContent =
-                    originalButtonText;
-            }
-        }
+            })
+            .catch((error) => {
+                console.error("Firebase Error:", error);   // 👈 see details in console
+                successMessage.hidden = false;
+                successMessage.textContent = error.message; // 👈 show exact reason
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                }
+            });
     });
 
     async function reserveSeat(sectionName, seatNumber, reservationId) {
@@ -870,41 +841,5 @@ if (
         });
     }
 
-}
-
-async function uploadStudentPhoto(file) {
-
-    const firebaseConfig = window.__FIREBASE_CONFIG__;
-
-    const [
-        { initializeApp, getApps, getApp },
-        {
-            getStorage,
-            ref,
-            uploadBytes,
-            getDownloadURL
-        }
-    ] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js")
-    ]);
-
-    const app = getApps().length
-        ? getApp()
-        : initializeApp(firebaseConfig);
-
-    const storage = getStorage(app);
-
-    const fileName =
-        `students/${Date.now()}_${file.name}`;
-
-    const storageRef = ref(storage, fileName);
-
-    await uploadBytes(storageRef, file);
-
-    const downloadURL =
-        await getDownloadURL(storageRef);
-
-    return downloadURL;
 }
 
