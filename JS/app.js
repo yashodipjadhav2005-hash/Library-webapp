@@ -89,7 +89,7 @@ async function saveSeatAdmission(payload) {
     const db = getFirestore(app);
 
     const docRef = await addDoc(
-        collection(db, "seatAdmissions"),
+        collection(db, "admins", "vez5ClBMuNPiNWkAJnA5b1hJqCD3", "NewRegistrations"),
         {
             ...payload,
             createdAt: serverTimestamp()
@@ -561,82 +561,6 @@ function resetFormValidation(form) {
         clearFieldError(field);
     });
 }
-
-// function createSeat(section, seatNumber) {
-//     const seat = document.createElement("button");
-//     const isBooked = section.booked.includes(seatNumber);
-
-//     seat.className = `seat ${isBooked ? "booked" : "available"}`;
-//     seat.type = "button";
-//     seat.innerHTML = `
-//         <span class="seat-icon" aria-hidden="true">
-//             <svg viewBox="0 0 24 24" focusable="false">
-//                 <path d="M7 12V9.5A2.5 2.5 0 0 1 9.5 7h5A2.5 2.5 0 0 1 17 9.5V12h1a2 2 0 0 1 2 2v3h-2v-2H6v2H4v-3a2 2 0 0 1 2-2h1Zm2-3a.5.5 0 0 0-.5.5V12h7V9.5a.5.5 0 0 0-.5-.5h-5ZM7 16h10v1.5a1.5 1.5 0 0 1-3 0V17h-4v.5a1.5 1.5 0 0 1-3 0V16Z"></path>
-//             </svg>
-//         </span>
-//         <span class="seat-number">${seatNumber}</span>
-//     `;
-//     seat.setAttribute("aria-label", `${section.name} seat ${seatNumber} ${isBooked ? "booked" : "available"}`);
-//     seat.disabled = isBooked;
-
-//     if (!isBooked) {
-//         seat.addEventListener("click", () => {
-//             if (activeSeatButton) {
-//                 activeSeatButton.classList.remove("selected");
-//             }
-
-//             activeSeatButton = seat;
-//             seat.classList.add("selected");
-//             selectedSectionInput.value = section.name;
-//             selectedSeatInput.value = seatNumber;
-//             selectedSeatLabel.textContent = `Selected: ${section.name} - Seat ${seatNumber}`;
-//             selectedSeatLabel.classList.remove("selection-error");
-//             selectedPricingLabel.textContent = `Seat Fee: ${section.seatFee} + Registration Fee: ${section.registrationFee} = Total: ${section.seatFee + section.registrationFee}`;
-//             successMessage.hidden = true;
-//             studentForm.scrollIntoView({ behavior: "smooth", block: "start" });
-//         });
-//     }
-//     return seat;
-// }
-
-// function createSectionCard(section) {
-//     const bookedCount = section.booked.length;
-//     const availableCount = totalSeats - bookedCount;
-
-//     const card = document.createElement("article");
-//     card.className = "library-section-card";
-
-//     const top = document.createElement("div");
-//     top.className = "section-top";
-//     top.innerHTML = `<h2>${section.name}</h2><span class="section-type">${section.type}</span>`;
-
-//     const counts = document.createElement("div");
-//     counts.className = "seat-counts";
-//     counts.innerHTML = `
-//         <span class="count-chip">Total: ${totalSeats}</span>
-//         <span class="count-chip">Available: ${availableCount}</span>
-//         <span class="count-chip">Booked: ${bookedCount}</span>
-//     `;
-
-//     const pricing = document.createElement("div");
-//     pricing.className = "seat-pricing";
-//     pricing.innerHTML = `
-//         <span class="price-chip">Seat Fee: ${section.seatFee}</span>
-//         <span class="price-chip">Registration Fee: ${section.registrationFee}</span>
-//         <span class="price-chip">Total: ${section.seatFee + section.registrationFee}</span>
-//     `;
-
-//     const seatGrid = document.createElement("div");
-//     seatGrid.className = "seats-grid";
-
-//     for (let i = 1; i <= totalSeats; i += 1) {
-//         seatGrid.appendChild(createSeat(section, i));
-//     }
-
-//     card.append(top, counts, pricing, seatGrid);
-//     return card;
-// }
-// Popup Elements
 
 // Popup Elements
 const successPopup =
