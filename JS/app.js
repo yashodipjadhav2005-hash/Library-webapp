@@ -89,7 +89,7 @@ async function saveSeatAdmission(payload) {
     const db = getFirestore(app);
 
     const docRef = await addDoc(
-        collection(db, "admins", "vez5ClBMuNPiNWkAJnA5b1hJqCD3", "NewRegistrations"),
+        collection(db, "admins", "pC1A2vbd09dDA2zMGzumTVEMT8P2", "NewRegistrations"),
         {
             ...payload,
             createdAt: serverTimestamp()
@@ -252,7 +252,7 @@ async function loadSeatsFromFirebase() {
     const seatsRef = collection(
         db,
         "admins",
-        "vez5ClBMuNPiNWkAJnA5b1hJqCD3",
+        "pC1A2vbd09dDA2zMGzumTVEMT8P2",
         "seat"
     );
 
@@ -277,102 +277,140 @@ async function loadSeatsFromFirebase() {
         renderSections(sectionMap);
     });
 }
-
 function renderSections(sectionMap) {
 
     sectionsGrid.innerHTML = "";
 
-    Object.keys(sectionMap).forEach((sectionName) => {
+    let totalLibraryAvailableSeats = 0;
 
-        const seats = sectionMap[sectionName].sort((a, b) => {
+    Object.keys(sectionMap)
 
-            const seatA = parseInt(
-                String(a.seatNumber).replace("S", "")
+        // ✅ Sort sections in ascending order
+        .sort((a, b) => {
+
+            const sectionA = parseInt(
+                a.replace(/\D/g, "")
             );
 
-            const seatB = parseInt(
-                String(b.seatNumber).replace("S", "")
+            const sectionB = parseInt(
+                b.replace(/\D/g, "")
             );
 
-            return seatA - seatB;
+            return sectionA - sectionB;
+        })
+
+        .forEach((sectionName) => {
+
+            // ✅ Sort seats in ascending order
+            const seats = sectionMap[sectionName].sort((a, b) => {
+
+                const seatA = parseInt(
+                    String(a.seatNumber)
+                        .replace("S", "")
+                );
+
+                const seatB = parseInt(
+                    String(b.seatNumber)
+                        .replace("S", "")
+                );
+
+                return seatA - seatB;
+            });
+
+            const firstSeat = seats[0];
+
+            const bookedCount = seats.filter(
+                seat => seat.status === "Booked"
+            ).length;
+
+            const reservedCount = seats.filter(
+                seat => seat.status === "Reserved"
+            ).length;
+
+            const availableCount =
+                seats.length - bookedCount - reservedCount;
+
+            // ✅ Total available seats in library
+            totalLibraryAvailableSeats += availableCount;
+
+            const section = {
+                name: sectionName,
+                type: firstSeat.seatType,
+                seatFees: firstSeat.seatFees,
+                registrationFee: 100,
+                seats: seats
+            };
+
+            const card = document.createElement("article");
+
+            card.className = "library-section-card";
+
+            card.innerHTML = `
+                <div class="section-top">
+                    <h2>${section.name}</h2>
+
+                    <span class="section-type">
+                        ${section.type}
+                    </span>
+                </div>
+
+                <div class="seat-counts">
+
+                    <span class="count-chip">
+                        Total: ${seats.length}
+                    </span>
+
+                    <span class="count-chip">
+                        Available: ${availableCount}
+                    </span>
+
+                    <span class="count-chip">
+                        Reserved: ${reservedCount}
+                    </span>
+
+                    <span class="count-chip">
+                        Booked: ${bookedCount}
+                    </span>
+
+                </div>
+
+                <div class="seat-pricing">
+
+                    <span class="price-chip">
+                        Seat Fee: ₹${section.seatFees}
+                    </span>
+
+                    <span class="price-chip">
+                        Registration Fee: ₹100
+                    </span>
+
+                </div>
+
+                <div class="seats-grid"></div>
+            `;
+
+            const seatGrid =
+                card.querySelector(".seats-grid");
+
+            seats.forEach((seatData) => {
+
+                seatGrid.appendChild(
+                    createDynamicSeat(section, seatData)
+                );
+
+            });
+
+            sectionsGrid.appendChild(card);
+
         });
 
-        const firstSeat = seats[0];
+    // ✅ Update total library available seats
+    if (libraryAvailableSeats) {
 
-        const bookedCount = seats.filter(
-            seat => seat.status === "Booked"
-        ).length;
+        libraryAvailableSeats.textContent =
+            totalLibraryAvailableSeats;
 
-        const reservedCount = seats.filter(
-            seat => seat.status === "Reserved"
-        ).length;
-
-        const availableCount =
-            seats.length - bookedCount - reservedCount;
-
-        const section = {
-            name: sectionName,
-            type: firstSeat.seatType,
-            seatFees: firstSeat.seatFees,
-            registrationFee: 100,
-            seats: seats
-        };
-
-        const card = document.createElement("article");
-
-        card.className = "library-section-card";
-
-        card.innerHTML = `
-            <div class="section-top">
-                <h2>${section.name}</h2>
-                <span class="section-type">
-                    ${section.type}
-                </span>
-            </div>
-
-            <div class="seat-counts">
-                <span class="count-chip">
-                    Total: ${seats.length}
-                </span>
-
-                <span class="count-chip">
-                    Available: ${availableCount}
-                </span>
-
-                <span class="count-chip">
-                    Reserved: ${reservedCount}
-                </span>
-
-                <span class="count-chip">
-                    Booked: ${bookedCount}
-                </span>
-            </div>
-
-            <div class="seat-pricing">
-                <span class="price-chip">
-                    Seat Fee: ₹${section.seatFees}
-                </span>
-
-                <span class="price-chip">
-                    Registration Fee: ₹100
-                </span>
-            </div>
-
-            <div class="seats-grid"></div>
-        `;
-
-        const seatGrid =
-            card.querySelector(".seats-grid");
-
-        seats.forEach((seatData) => {
-
-            seatGrid.appendChild(
-                createDynamicSeat(section, seatData)
-            );
-        });
-
-        sectionsGrid.appendChild(card);
-    });
+    }
 }
 
 function createDynamicSeat(section, seatData) {
@@ -739,7 +777,7 @@ if (
         const seatsRef = collection(
             db,
             "admins",
-            "vez5ClBMuNPiNWkAJnA5b1hJqCD3",
+            "pC1A2vbd09dDA2zMGzumTVEMT8P2",
             "seat"
         );
 
