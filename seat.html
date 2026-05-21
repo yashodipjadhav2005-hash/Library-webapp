@@ -150,6 +150,26 @@
 
     </div>
 
+    <div id="utrPopup" class="popup-overlay" hidden>
+        <div class="popup-box">
+            <div class="popup-header">
+                <h3>Complete your payment</h3>
+                <p>Your seat is temporarily reserved. Pay and enter your UTR number to confirm.</p>
+            </div>
+            <div class="popup-amount">
+                Amount: <strong id="utrAmountLabel"></strong>
+            </div>
+            <div class="field">
+                <label for="utrInput">UTR number</label>
+                <input type="text" id="utrInput" placeholder="Enter the UTR number" />
+                <p class="field-error" id="utrError" hidden></p>
+            </div>
+            <div class="popup-actions">
+                <button type="button" id="utrCancelBtn">Cancel</button>
+                <button type="button" id="utrConfirmBtn">Confirm payment</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         window.__FIREBASE_CONFIG__ = {
