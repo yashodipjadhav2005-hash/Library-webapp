@@ -303,7 +303,14 @@ if (utrConfirmBtn) {
 
             if (successMessage) {
                 successMessage.hidden = false;
-                successMessage.textContent = "Registration successful! Payment recorded. ✓";
+                successMessage.innerHTML = `
+                <div class="success-card">
+                    <div class="success-icon">✓</div>
+                    <h3>Registration Successful!</h3>
+                     <p>Payment recorded successfully.</p>
+                        <p class="seat-info">📍 You can sit at your selected seat</p>
+                    </div>
+                `;
             }
 
         } catch (error) {
